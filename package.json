@@ -1,0 +1,13 @@
+{
+  "name": "safeplate-ai",
+  "version": "1.0.0",
+  "description": "Open-Source AI Safe Recipe & Allergy Shield for a Friend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["open-source-ai", "ollama", "hacktoberfest", "devchallenge", "dietary-ai"],
+  "author": "",
+  "license": "MIT"
+}

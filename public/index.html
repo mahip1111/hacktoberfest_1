@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafePlate AI — Open-Source Allergy Shield & Safe Kitchen Companion</title>
+  <meta name="description" content="An open-source, 100% local AI assistant that crafts delicious, allergen-safe meals and substitutes hazardous ingredients for your friends with severe dietary restrictions.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background Glow Accents -->
+  <div class="bg-mesh">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div class="app-layout">
+    <!-- Main Top Navigation -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-logo-badge">
+          <span class="logo-icon">🛡️</span>
+          <span class="logo-pulse"></span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-wrap">
+            <h1 class="brand-title">SafePlate <span class="gradient-text">AI</span></h1>
+            <span class="badge-hacktoberfest">🎃 Hacktoberfest '26</span>
+          </div>
+          <p class="brand-subtitle">Open-Source Local Allergy Shield • Built for a Friend</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- AI Model & Status Indicator -->
+        <div class="ollama-status-card" id="ollamaStatusCard">
+          <div class="status-indicator">
+            <span class="status-dot dot-checking" id="statusDot"></span>
+            <span class="status-label" id="statusLabel">Checking Local Ollama...</span>
+          </div>
+          <div class="model-select-wrapper">
+            <span class="model-icon">🤖</span>
+            <select id="modelSelect" class="model-select" title="Active Model">
+              <option value="llama3.2:1b">llama3.2:1b (Local)</option>
+              <option value="llama3.2:3b">llama3.2:3b</option>
+              <option value="gemma2:2b">gemma2:2b</option>
+              <option value="mistral">mistral</option>
+              <option value="offline-smart-fallback">Smart Offline Engine</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary btn-icon" id="openDevRelayModalBtn" title="DevRelay Session & Open Source Info">
+          <span>⚡ Why Open AI?</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="main-container">
+      
+      <!-- Left Column: Friend Profile & Kitchen Inventory -->
+      <section class="panel panel-left">
+        
+        <!-- Friend Persona Selector Banner -->
+        <div class="friend-profile-card">
+          <div class="card-header">
+            <div class="friend-avatar-wrap">
+              <span class="friend-avatar" id="currentAvatar">🧑‍🍳</span>
+              <span class="shield-badge" title="Protected by Local AI">🛡️</span>
+            </div>
+            <div class="friend-info">
+              <span class="card-tag">PROTECTED FRIEND</span>
+              <div class="friend-name-row">
+                <h2 class="friend-name" id="currentFriendName">Rohan Gupta</h2>
+                <button class="btn-text-edit" id="editFriendBtn" title="Edit Profile">✏️</button>
+              </div>
+              <p class="friend-summary" id="currentFriendSummary">Severe Peanut & Nut Allergy + Celiac Gluten-Free</p>
+            </div>
+          </div>
+
+          <!-- Quick Switcher for Demo / Friends -->
+          <div class="preset-pill-group">
+            <span class="group-label">Quick Preset:</span>
+            <button class="preset-pill active" data-preset="rohan">Rohan (Peanut + Gluten-Free)</button>
+            <button class="preset-pill" data-preset="aisha">Aisha (Dairy-Free + Vegan)</button>
+            <button class="preset-pill" data-preset="david">David (Low-FODMAP & Shellfish)</button>
+            <button class="preset-pill" data-preset="custom">+ Custom</button>
+          </div>
+        </div>
+
+        <!-- Allergy & Health Matrix Filter -->
+        <div class="card-section">
+          <div class="section-title-row">
+            <h3 class="section-title">🚨 Active Safety Restrictions</h3>
+            <span class="active-count-badge" id="activeAllergiesCount">2 Active</span>
+          </div>
+
+          <div class="allergy-tags-grid" id="allergyTagsGrid">
+            <label class="allergy-checkbox-pill dangerous-allergy">
+              <input type="checkbox" value="Peanuts" checked data-category="nuts">
+              <span class="pill-icon">🥜</span>
+              <span class="pill-text">Peanuts</span>
+            </label>
+
+            <label class="allergy-checkbox-pill dangerous-allergy">
+              <input type="checkbox" value="Gluten / Wheat" checked data-category="grains">
+              <span class="pill-icon">🌾</span>
+              <span class="pill-text">Gluten / Celiac</span>
+            </label>
+
+            <label class="allergy-checkbox-pill">
+              <input type="checkbox" value="Tree Nuts" data-category="nuts">
+              <span class="pill-icon">🌰</span>
+              <span class="pill-text">Tree Nuts</span>
+            </label>
+
+            <label class="allergy-checkbox-pill">
+              <input type="checkbox" value="Dairy / Lactose" data-category="dairy">
+              <span class="pill-icon">🥛</span>
+              <span class="pill-text">Dairy / Lactose</span>
+            </label>
+
+            <label class="allergy-checkbox-pill">
+              <input type="checkbox" value="Eggs" data-category="eggs">
+              <span class="pill-icon">🥚</span>
+              <span class="pill-text">Eggs</span>
+            </label>
+
+            <label class="allergy-checkbox-pill">
+              <input type="checkbox" value="Shellfish" data-category="seafood">
+              <span class="pill-icon">🦐</span>
+              <span class="pill-text">Shellfish</span>
+            </label>
+
+            <label class="allergy-checkbox-pill">
+              <input type="checkbox" value="Soy" data-category="soy">
+              <span class="pill-icon">🌱</span>
+              <span class="pill-text">Soy / Soya</span>
+            </label>
+
+            <label class="allergy-checkbox-pill">
+              <input type="checkbox" value="Sesame" data-category="seeds">
+              <span class="pill-icon">🥯</span>
+              <span class="pill-text">Sesame</span>
+            </label>
+
+            <label class="allergy-checkbox-pill">
+              <input type="checkbox" value="High FODMAP (Garlic/Onion)" data-category="fodmap">
+              <span class="pill-icon">🧄</span>
+              <span class="pill-text">Garlic & Onion</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pantry & Fridge Input Studio -->
+        <div class="card-section">
+          <div class="section-title-row">
+            <h3 class="section-title">🥘 What's in the Kitchen?</h3>
+            <button class="btn-text" id="clearPantryBtn">Clear</button>
+          </div>
+
+          <!-- Quick Add Pantry Staples -->
+          <div class="quick-add-wrap">
+            <span class="quick-label">Tap to add staples:</span>
+            <div class="quick-tags-scroller">
+              <button class="chip-add" data-item="Basmati Rice">🍚 Rice</button>
+              <button class="chip-add" data-item="Chicken Breast">🍗 Chicken</button>
+              <button class="chip-add" data-item="Firm Tofu">🧈 Tofu</button>
+              <button class="chip-add" data-item="Eggs">🥚 Eggs</button>
+              <button class="chip-add" data-item="Tomatoes">🍅 Tomatoes</button>
+              <button class="chip-add" data-item="Spinach">🥬 Spinach</button>
+              <button class="chip-add" data-item="Bell Peppers">🫑 Bell Peppers</button>
+              <button class="chip-add" data-item="Potatoes">🥔 Potatoes</button>
+              <button class="chip-add" data-item="Coconut Milk">🥥 Coconut Milk</button>
+              <button class="chip-add" data-item="Olive Oil">🫒 Olive Oil</button>
+              <button class="chip-add chip-warn" data-item="Soy Sauce" title="May contain gluten!">⚠️ Soy Sauce</button>
+              <button class="chip-add chip-warn" data-item="Peanut Butter" title="Hazard for peanut allergy!">⚠️ Peanut Butter</button>
+            </div>
+          </div>
+
+          <!-- Ingredient Tags Container -->
+          <div class="pantry-tags-box" id="pantryTagsBox">
+            <!-- Dynamically populated tags -->
+            <span class="empty-pantry-hint">Add ingredients below or click staples above...</span>
+          </div>
+
+          <!-- Input bar to add custom items -->
+          <div class="input-row">
+            <input type="text" id="customIngredientInput" class="custom-input" placeholder="Type ingredient (e.g. Avocado, Quinoa, Paneer)..." autocomplete="off">
+            <button class="btn btn-primary" id="addIngredientBtn">Add</button>
+          </div>
+
+          <!-- Mode & Goal Selector -->
+          <div class="mode-options-grid">
+            <div class="option-card active" data-mode="safe_recipe">
+              <span class="mode-icon">✨</span>
+              <div class="mode-info">
+                <strong>Craft Safe Meal</strong>
+                <small>Create from kitchen items</small>
+              </div>
+            </div>
+
+            <div class="option-card" data-mode="substitute_audit">
+              <span class="mode-icon">🔍</span>
+              <div class="mode-info">
+                <strong>Allergy Safety Audit</strong>
+                <small>Scan recipe & substitute</small>
+              </div>
+            </div>
+
+            <div class="option-card" data-mode="fast_snack">
+              <span class="mode-icon">⚡</span>
+              <div class="mode-info">
+                <strong>10-Min Fast Snack</strong>
+                <small>Quick zero-risk bites</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Recipe / Dish Notes (Optional) -->
+          <div class="recipe-notes-wrap" id="recipeNotesWrap" style="display: none;">
+            <textarea id="recipeInputText" class="custom-textarea" rows="3" placeholder="Paste an existing recipe or list of ingredients here to check for allergens and generate 100% safe substitutes..."></textarea>
+          </div>
+
+          <!-- Action Button -->
+          <button class="btn btn-cta" id="generateSafeMealBtn">
+            <span class="btn-sparkle">✨</span>
+            <span id="btnText">Generate Safe Meal for Rohan</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- Right Column: AI Live Cooking Studio & Allergen Radar -->
+      <section class="panel panel-right">
+        
+        <!-- Live Danger & Substitution Radar (Appears when hazards detected) -->
+        <div class="allergen-radar-card" id="allergenRadarCard" style="display: none;">
+          <div class="radar-header">
+            <div class="radar-title-wrap">
+              <span class="radar-alert-icon">⚠️</span>
+              <div>
+                <h3 class="radar-title">Allergen Threat Radar: Safe Substitutions Active</h3>
+                <p class="radar-desc">Our local open-source AI intercepted dangerous ingredients and engineered safe swaps.</p>
+              </div>
+            </div>
+          </div>
+          <div class="swaps-grid" id="swapsGrid">
+            <!-- Injected dynamic swap cards -->
+          </div>
+        </div>
+
+        <!-- Recipe Output Card -->
+        <div class="recipe-studio-card" id="recipeStudioCard">
+          
+          <!-- Empty State (Initial) -->
+          <div class="empty-studio-state" id="emptyStudioState">
+            <div class="empty-icon-shield">🛡️🍳</div>
+            <h2>Ready to Cook Safely for Your Friend</h2>
+            <p>Select ingredients from your kitchen and let our <strong>100% Local Open-Source AI</strong> build an appetizing, allergy-safe recipe tailored specifically to your friend's medical restrictions.</p>
+            
+            <div class="feature-highlights">
+              <div class="highlight-item">
+                <span class="h-icon">🔒</span>
+                <div>
+                  <strong>Complete Health Privacy</strong>
+                  <small>Medical & allergy data never leaves your laptop</small>
+                </div>
+              </div>
+              <div class="highlight-item">
+                <span class="h-icon">⚡</span>
+                <div>
+                  <strong>Instant Local Inference</strong>
+                  <small>Powered by Ollama (Llama 3.2 / Gemma 2)</small>
+                </div>
+              </div>
+              <div class="highlight-item">
+                <span class="h-icon">💸</span>
+                <div>
+                  <strong>Zero Token Cost</strong>
+                  <small>Infinite cooking suggestions forever free</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Generating Loader -->
+          <div class="generating-state" id="generatingState" style="display: none;">
+            <div class="cook-loader">
+              <div class="pan">
+                <div class="pan-handle"></div>
+                <div class="cooking-food">🥗</div>
+              </div>
+              <div class="steam-wrap">
+                <span class="steam s1"></span>
+                <span class="steam s2"></span>
+                <span class="steam s3"></span>
+              </div>
+            </div>
+            <h3 id="loaderStatusText">Ollama is analyzing safety matrix & crafting meal...</h3>
+            <p class="loader-sub">Cross-checking all ingredients against active allergy restrictions</p>
+            <div class="live-token-stream-preview" id="liveTokenStream"></div>
+          </div>
+
+          <!-- Rendered Recipe Container -->
+          <div class="rendered-recipe-content" id="renderedRecipeContent" style="display: none;">
+            
+            <!-- Recipe Meta Header -->
+            <div class="recipe-top-bar">
+              <div class="recipe-badge-row">
+                <span class="badge-safe">✅ 100% ALLERGEN-SAFE</span>
+                <span class="badge-time" id="recipeTimeBadge">⏱️ 25 Mins</span>
+                <span class="badge-servings" id="recipeServingsBadge">👥 2 Servings</span>
+                <span class="badge-macro" id="recipeMacroBadge">💪 High Protein</span>
+              </div>
+              <div class="recipe-actions-bar">
+                <button class="btn btn-secondary btn-sm" id="printRecipeBtn" title="Print Recipe Card">🖨️ Print / PDF</button>
+                <button class="btn btn-secondary btn-sm" id="copyRecipeBtn" title="Copy to Clipboard">📋 Copy Card</button>
+                <button class="btn btn-secondary btn-sm" id="shareFriendBtn" title="Share with Friend">💌 Share</button>
+              </div>
+            </div>
+
+            <h2 class="recipe-headline" id="recipeHeadline">Creamy Coconut-Turmeric Rice Bowl with Pan-Seared Chicken & Safe Crispy Garlic</h2>
+            
+            <p class="recipe-lead" id="recipeLead">A vibrant, satisfying meal completely free from peanuts, tree nuts, and gluten, utilizing gluten-free tamari and sunflower seeds for rich nutty crunch.</p>
+
+            <!-- Interactive Kitchen Timer Bar -->
+            <div class="kitchen-timer-card">
+              <div class="timer-info">
+                <span class="timer-icon">⏱️</span>
+                <div>
+                  <strong>Interactive Kitchen Cook Timer</strong>
+                  <small>Keep track while cooking in the kitchen</small>
+                </div>
+              </div>
+              <div class="timer-controls">
+                <div class="timer-display" id="timerDisplay">20:00</div>
+                <button class="btn btn-sm btn-primary" id="startTimerBtn">Start</button>
+                <button class="btn btn-sm btn-secondary" id="resetTimerBtn">Reset</button>
+              </div>
+            </div>
+
+            <!-- Recipe Grid: Ingredients & Steps -->
+            <div class="recipe-split-grid">
+              
+              <!-- Ingredients Column -->
+              <div class="recipe-col-ingredients">
+                <h3 class="col-title">🛒 Safe Ingredients</h3>
+                <ul class="ingredient-checklist" id="ingredientChecklist">
+                  <!-- Dynamic ingredients -->
+                </ul>
+
+                <div class="nutrition-card">
+                  <h4>📊 Estimated Macros (Per Serving)</h4>
+                  <div class="macro-grid" id="macroGrid">
+                    <div class="macro-pill"><span>Calories</span><strong id="macroCal">520 kcal</strong></div>
+                    <div class="macro-pill"><span>Protein</span><strong id="macroProt">38g</strong></div>
+                    <div class="macro-pill"><span>Carbs</span><strong id="macroCarb">54g</strong></div>
+                    <div class="macro-pill"><span>Fats</span><strong id="macroFat">16g</strong></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Steps Column -->
+              <div class="recipe-col-steps">
+                <h3 class="col-title">👨‍🍳 Step-by-Step Instructions</h3>
+                <div class="steps-timeline" id="stepsTimeline">
+                  <!-- Dynamic steps -->
+                </div>
+
+                <div class="pro-chef-tip-box" id="chefTipBox">
+                  <span class="tip-icon">💡</span>
+                  <div class="tip-text">
+                    <strong>Chef's Safety Note for Rohan:</strong>
+                    <p id="chefTipText">Always verify that your coconut milk brand is produced in a dedicated nut-free facility to prevent manufacturing cross-contact.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Friend Feedback Note Box -->
+            <div class="friend-handoff-card">
+              <div class="handoff-header">
+                <span>🎁 Built with Love for Rohan</span>
+                <span class="timestamp" id="handoffTimestamp">Ready to Cook</span>
+              </div>
+              <p class="handoff-msg">"Cooked this with Rohan on Sunday! He was so relieved not having to double-check ingredients or worry about stomach pain. Clean plates all around."</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-inner">
+        <p>Built for the <strong>Hacktoberfest Weekend Challenge: Build for a Friend</strong> • Powered by Open-Source AI (Ollama + Llama 3.2)</p>
+        <div class="footer-links">
+          <a href="#" id="viewAgentSessionLink">📜 DevRelay Agent Session</a>
+          <span>•</span>
+          <a href="https://dev.to/challenges/hacktoberfest-weekend-2026-10-01" target="_blank" rel="noopener">🏆 Challenge Page</a>
+          <span>•</span>
+          <a href="https://ollama.com" target="_blank" rel="noopener">🦙 Ollama</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal: Edit Friend Profile -->
+  <div class="modal-overlay" id="friendModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Edit Friend Profile</h3>
+        <button class="modal-close" id="closeFriendModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="modalFriendName">Friend's Name:</label>
+          <input type="text" id="modalFriendName" class="custom-input" value="Rohan Gupta">
+        </div>
+        <div class="form-group">
+          <label for="modalFriendAvatar">Avatar Emoji:</label>
+          <input type="text" id="modalFriendAvatar" class="custom-input" value="🧑‍🍳" style="width: 80px;">
+        </div>
+        <div class="form-group">
+          <label for="modalFriendSummary">Personal Note / Health Description:</label>
+          <input type="text" id="modalFriendSummary" class="custom-input" value="Severe Peanut & Nut Allergy + Celiac Gluten-Free">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelFriendModalBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveFriendModalBtn">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Why Open Innovation & DevRelay Session Inspector -->
+  <div class="modal-overlay" id="devrelayModal" style="display: none;">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">⚡</span>
+          <h3>Why Open-Source AI Matters for This Project</h3>
+        </div>
+        <button class="modal-close" id="closeDevRelayModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="manifesto-grid">
+          <div class="manifesto-card">
+            <h4>🔒 1. Radical Health & Medical Privacy</h4>
+            <p>Dietary restrictions and allergy histories are sensitive personal health information. Running inference <strong>100% locally via Ollama</strong> guarantees that your friend's personal vulnerabilities are never logged by third-party telemetry, ad networks, or cloud surveillance.</p>
+          </div>
+          <div class="manifesto-card">
+            <h4>💸 2. Zero-Cost Cooking for Everyone</h4>
+            <p>Commercial APIs charge per token. A family or student cooking 3 meals a day should not pay a monthly tax just to eat safely. Local open weights (like <strong>Llama 3.2</strong> and <strong>Gemma 2</strong>) cost exactly $0.00 to run forever.</p>
+          </div>
+          <div class="manifesto-card">
+            <h4>📶 3. Kitchen-Proof Offline Reliability</h4>
+            <p>Kitchens and basements often have dead zones or spotty Wi-Fi. SafePlate runs on a laptop or local kitchen tablet with zero internet connection required.</p>
+          </div>
+          <div class="manifesto-card">
+            <h4>🔧 4. Full Custom System Prompts & Hackability</h4>
+            <p>Open models allow us to calibrate strict temperature parameters, fine-tune medical guardrails, and swap models at will without fear of vendor lock-in or sudden deprecation.</p>
+          </div>
+        </div>
+
+        <div class="session-embed-box">
+          <h4>🤖 DevRelay Agent Session Integration</h4>
+          <p>This entire application was pair-programmed and verified using agentic AI. You can inspect the complete agent building transcript and tool calls:</p>
+          <div class="code-pill-preview">
+            <code>{% agent_session hacktoberfest-safeplate-ai-friend %}</code>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="closeDevRelayModalBtn2">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
