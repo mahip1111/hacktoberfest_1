@@ -41,7 +41,7 @@ const server = http.createServer(async (req, res) => {
         port: OLLAMA_PORT,
         path: '/api/tags',
         method: 'GET',
-        timeout: 2500
+        timeout: 2000
       }, (ollamaRes) => {
         let data = '';
         ollamaRes.on('data', chunk => { data += chunk; });
@@ -61,11 +61,11 @@ const server = http.createServer(async (req, res) => {
         });
       });
 
-      ollamaReq.on('error', (err) => {
+      ollamaReq.on('error', () => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           status: 'offline',
-          message: 'Ollama local server not detected on default port 11434. Smart offline fallback will be active.',
+          message: 'Ollama local server offline or busy. Smart offline fallback active.',
           models: []
         }));
       });
@@ -84,7 +84,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // API: AI Generation Proxy with streaming support
+  // API: AI Generation Proxy with 6s Timeout Safety
   if (pathname === '/api/generate' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -98,6 +98,7 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
+      let isHandled = false;
       const ollamaReq = http.request({
         hostname: OLLAMA_HOST,
         port: OLLAMA_PORT,
@@ -105,8 +106,10 @@ const server = http.createServer(async (req, res) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 6000 // 6 second safety limit
       }, (ollamaRes) => {
+        if (isHandled) return;
         res.writeHead(ollamaRes.statusCode, {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
@@ -117,10 +120,23 @@ const server = http.createServer(async (req, res) => {
       });
 
       ollamaReq.on('error', (err) => {
-        res.writeHead(503, { 'Content-Type': 'application/json' });
+        if (isHandled) return;
+        isHandled = true;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
-          error: 'Ollama connection error: ' + err.message,
-          fallback_available: true
+          fallback: true,
+          error: 'Ollama busy or offline: ' + err.message
+        }));
+      });
+
+      ollamaReq.on('timeout', () => {
+        if (isHandled) return;
+        isHandled = true;
+        ollamaReq.destroy();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          fallback: true,
+          error: 'Ollama response timed out. Falling back to internal engine.'
         }));
       });
 
@@ -143,7 +159,6 @@ const server = http.createServer(async (req, res) => {
   fs.readFile(filePath, (err, content) => {
     if (err) {
       if (err.code === 'ENOENT') {
-        // Fallback to index.html for SPA-style routing if appropriate
         fs.readFile(path.join(__dirname, 'public', 'index.html'), (err2, indexContent) => {
           if (err2) {
             res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -165,8 +180,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`====================================================`);
   console.log(`🛡️  SafePlate AI Server running at http://localhost:${PORT}`);
-  console.log(`🤖 Local Ollama Proxy Target: http://${OLLAMA_HOST}:${OLLAMA_PORT}`);
-  console.log(`====================================================`);
 });
